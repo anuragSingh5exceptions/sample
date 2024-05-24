@@ -1,8 +1,5 @@
 ---
 sidebar_position: 1
-id: intro
-title: Java Introduction
-sidebar_label: Introduction
 ---
 # Overview
 ## Get Started with TruVideo SDK

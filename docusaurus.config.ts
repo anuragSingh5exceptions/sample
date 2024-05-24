@@ -102,7 +102,7 @@ const config: Config = {
               label: 'Java',
             },
             {
-              to: '/kotlin/Intro',    // ./kotlin/Intro.md
+              to: '/kotlin/overview',    // ./kotlin/Intro.md
               label: 'Kotlin',
               activeBaseRegex: `/kotlin/`,
             },
@@ -175,7 +175,7 @@ const config: Config = {
           items: [
             {
               label: 'SDK data privacy',
-              to: '/blog',
+              to: 'https://github.com/facebook/docusaurus',
             },
             {
               label: 'SDK License',
