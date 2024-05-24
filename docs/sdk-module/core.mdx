@@ -1,0 +1,134 @@
+---
+sidebar_position: 1
+---
+# Core
+A robust user authentication system is implemented to ensure our platform's security and privacy. User credentials are securely stored and encrypted using industry-standard methods. Access control is enforced through carefully managed permissions, granting users access only to features and functionalities based on the entitlements. This approach adheres to stringent security and data protection standards. Personalized services are provided by leveraging stored credentials, allowing for tailored user experiences. It is important to note that authentication is mandatory for utilizing any functionality within the TruvideoSDK. 
+ 
+:::note Note
+
+Please note that authentication is a prerequisite for utilizing any functionality within the TruvideoSDK.
+
+:::
+
+### Adding Module
+Include the following dependency in your gradle file 
+```swift
+implementation 'com.github.Truvideo:truvideo-sdk-android-core:0.2.03'
+```
+Ensure the inclusion of the jitpack repository in the setting. gradle file
+
+```swift
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven {
+            url 'https://jitpack.io'
+        }
+    }
+}
+```
+### Required permissions
+To access internet service you need to add the below code to AndroidManifest.xml
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+### Authentication Status
+The Truvideo SDK provides two properties that serve to check the authentication status: 
+- isAuthenticated : Returns true or false indicating whether the client is authenticated. Please note that authentication may be expired.
+- isAuthenticationExpired : Return true or false indicating whether the authentication is expired. If the client is not authenticated, it always returns false.
+```swift
+Boolean isAuthenticated = TruvideoSdk.getInstance().isAuthenticated();
+Boolean isAuthenticationExpired = TruvideoSdk.getInstance() .isAuthenticationExpired();
+```
+How to authenticate 
+The authenticate method requires the following inputs:
+1. ApiKey: A string provided by Truvideo upon registration.
+2. Payload: Essential data containing device information, generated internally using the generatePayload() function.
+3. Signature: Encrypt the payload with the provided secret key using the SHA256 algorithm to regenerate the signature.
+
+Upon completion, it triggers the onReady callback or the onError callback in case of an error.
+
+:::note
+The API key and Secret key are provided by the TRUVideo SDK team.
+:::
+
+### Algorithm for encoding the signature:
+The encoding algorithm operates by taking the secret key and payload as inputs, generating an encoded string suitable for authentication purposes.
+```swift
+public String toSha256String(String key, String msg) {
+    try {
+        // getting instance of Message Authentication Code
+        Mac hmacSha256 = Mac.getInstance("HmacSHA256");
+        //secretKey
+        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+        hmacSha256.init(secretKey);
+        byte[] macData = hmacSha256.doFinal(msg.getBytes());
+        // Convert byte array to hex string
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : macData) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+```
+:::note
+We suggest avoiding storing the secret within the host application. Instead, set up a private backend owned by you. This backend will handle the payload from the Truvideo SDK and generate the signature. By doing this, you can prevent the secret from being exposed, reducing the risk of security issues
+:::
+
+```swift
+public void authenticate(ComponentActivity context) {
+    // Check if a user is authenticated
+    boolean isAuthenticated = TruvideoSdk.getInstance().isAuthenticated();
+    // Check if the authentication token has expired
+    boolean isAuthenticationExpired = TruvideoSdk.getInstance() .isAuthenticationExpired();
+    if (!isAuthenticated || isAuthenticationExpired) {
+        // Get API key and secret key
+        String apiKey = context.getResources().getString(R.string.api_key);
+        // generate payload for authentication
+        String payload = TruvideoSdk.generatePayload();
+        String signature = context.getResources().getString(R.string.secret_key);
+        // generate SHA-256 hash of payload with signature as secret key
+        String sha256 = toSha256String(signature, payload);
+        // Authenticate user
+        TruvideoSdk.getInstance().authenticate(apiKey, payload, sha256, new TruvideoSdkAuthenticationCallback() {
+            @Override
+            public void onReady() {
+                // If the user is authenticated successfully
+            }
+            @Override
+            public void onError(TruvideoSdkException e) {
+                Log.d("TAG", "onError: ");
+                // If user authentication failed
+            }
+        });
+    } else {
+        TruvideoSdk.getInstance().init(new TruvideoSdkInitCallback() {
+            @Override
+            public void onReady() {
+                Log.d("TAG", "onReady: false");
+                // If the user is authenticated successfully
+            }
+            @Override
+            public void onError(TruvideoSdkException e) {
+                // If user authentication failed
+            }
+        });
+    }
+}
+```
+### Clear Authentication
+To delete the current session and erase all associated authentication data, utilize the clear method 
+
+```swift
+TruvideoSdk.getInstance().clear()
+```

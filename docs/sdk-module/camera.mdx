@@ -1,0 +1,196 @@
+---
+sidebar_position: 2
+---
+# Camera
+The camera module helps to make camera app development easier, It provides consistency and an easy-to-use API for capturing images, videos and storing them.
+
+**Primary Use Cases**
+It improves the developer experience in several key ways.
+- Handle the entire process of capturing and storing so that the developer focus more on the coding part 
+- Giving more control over the camera by changing some parameters, even control over orientation 
+- Support multiple captures of photos and video in a single time
+
+**Ease of use** 
+It allows you to focus on the task you need to get done instead of managing device-specific nuances.Most common camera use cases are supported:
+- Image Capture: Save the Image
+- Video Capture: Save video and audio
+
+### Adding the module
+Include the following dependency in your gradle file 
+```swift
+implementation 'com.github.Truvideo:truvideo-sdk-android-camera:0.3.07'
+```
+Ensure the inclusion of the jitpack repository in the setting. gradle file
+
+```swift
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven {
+            url 'https://jitpack.io'
+        }
+    }
+}
+```
+### Required permissions
+To access the camera and microphone in the Android app, you have to include some of the necessary permissions in your AndroidManifest.xml file. These permission are 
+
+```xml
+<uses-feature android:name="android.hardware.camera.any" />
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+``` 
+
+### Camera Initialization
+`TruvideoSdkCamera` is the single class containing the methods required to work with the camera module these are : 
+- `init(ComponentActivity)`: This function is responsible for initializing the camera module it takes `component` activity as input. 
+
+```swift
+import com.truvideo.sdk.camera.TruvideoSdkCamera
+
+public class YourActivity extends AppCompatActivity{
+    @Override 
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        TruvideoSdkCamera.getInstance().init(this);
+        //...rest of your code
+    }
+}
+```
+- `start(truvideoSdkCameraConfiguration,truvideoSdkCameraCallback)`: This function is responsible for starting the camera view it takes `TruvideoSdkCameraConfiguration` and `TruvideoSdkCameraCallback` as input 
+    - `TruvideoSdkCameraConfiguration`: this is a data class that contains camera configuration data.
+    - `TruvideoSdkCameraCallback`: This is an interface class that returns a list of captured images and video as media.
+```swift
+public void openCamera() {
+    TruvideoSdkCamera.getInstance().start(
+        // This configuration parameter changes the camera config
+        new TruvideoSdkCameraConfiguration(
+            TruvideoSdkCameraLensFacing.BACK,
+            TruvideoSdkCameraFlashMode.OFF,
+            null,
+            "",
+            null,
+            null,
+            null,
+            null,
+            TruvideoSdkCameraVideoCodec.H264,
+            TruvideoSdkCameraMode.VIDEO_AND_PICTURE
+        ),
+        // callback return list TruvideoSdkCameraMedia from which you can get the file path
+        new TruvideoSdkCameraCallback() {
+            @Override
+            public void onResult(List<TruvideoSdkCameraMedia> media) {
+                // media is a list of captured images and videos
+            }
+        }
+    );
+}
+```
+### Augmented Reality (AR) [BETA]
+Presents the TruvideoSDK Augmented Reality (AR) camera view for capturing augmented reality content. This method should be called from an Activity to present the AR camera view. The TruVideoSDK provides advanced tools for creating an immersive augmented reality experience allowing your users to pin arrows or make measurements. Use the startAugmentedRealityCamera method to initiate the AR camera view and capture AR content, such as images or video. Upon completion of the camera operation, the provided closure is invoked with a list of TruVideoSdkCameraMedia, allowing you to handle the captured content and perform further processing or integration with your application.
+```swift
+public void openCamera() {
+        TruvideoSdkCamera.startAugmentedRealityCamera(
+            new TruvideoSdkCameraCallback() {
+                @Override
+                public void onResult(List<TruvideoSdkCameraMedia> media) {
+                }
+            }
+        );
+}
+```
+### Entities
+**Preset**
+
+`TruvideoSdkCameraConfiguration` is a public class that encapsulates the configuration parameters for the TruvideoSDK camera. It includes settings such as the lens facing direction (front or back), flash mode, video orientation, output path for saved content, preferred video codec, and camera mode. This structure allows developers to customize camera behavior and output format to suit specific application requirements
+```kotlin
+class TruvideoSdkCameraConfiguration (
+    val lensFacing: TruvideoSdkCameraLensFacing = TruvideoSdkCameraLensFacing.BACK,
+    val flashMode: TruvideoSdkCameraFlashMode = TruvideoSdkCameraFlashMode.OFF,
+    val orientation: TruvideoSdkCameraOrientation? = null,
+    val outputPath: String = "",
+    val frontResolutions: List<TruvideoSdkCameraResolution> = listOf(),
+    val frontResolution: TruvideoSdkCameraResolution? = null,
+    val backResolutions: List<TruvideoSdkCameraResolution> = listOf(),
+    val backResolution: TruvideoSdkCameraResolution? = null,
+    val videoCodec: TruvideoSdkCameraVideoCodec = TruvideoSdkCameraVideoCodec.H264,
+    val mode: TruvideoSdkCameraMode = TruvideoSdkCameraMode.VIDEO_AND_PICTURE
+)
+```
+**Lens Facing**
+
+`TruvideoSdkCameraLensFacing` enum represents the two possible directions of a camera lens: back or front.
+```kotlin
+enum class TruvideoSdkCameraLensFacing{
+   BACK,
+   FRONT;
+}
+```
+**Flash Mode**
+
+`TruvideoSdkCameraFlashMode` enum defines two flash modes: off and on, offering developers control over flash functionality during media capture.
+```kotlin
+enum class TruvideoSdkCameraFlashMode {
+   OFF,
+   ON;
+}
+```
+**Orientation**
+
+`TruvideoSdkCameraOrientation` enum offers four orientation choices: portrait, landscapeLeft, landscapeRight, and portraitReverse, enabling developers to define camera orientation preferences for media capture.
+```kotlin
+enum class TruvideoSdkCameraOrientation {
+   PORTRAIT,
+   LANDSCAPE_LEFT,
+   LANDSCAPE_RIGHT,
+   PORTRAIT_REVERSE;
+}
+```
+
+**Camera Mode**
+
+`TruvideoSdkCameraMode` enum includes three modes: video and picture, video, and picture, enabling developers to specify whether the camera should capture both video and pictures, only video, or only pictures, respectively.
+```kotlin
+enum class TruvideoSdkCameraMode{
+   VIDEO_AND_PICTURE,
+   VIDEO,
+   PICTURE;
+}
+```
+
+**Video Codec**
+
+`TruvideoSdkCameraVideoCodec` enum defines two video codec options: h264 and h265, providing developers with choices for encoding video content within the TruvideoSDK.
+```kotlin
+enum class TruvideoSdkCameraVideoCodec{
+   H264,
+   H265;
+}
+```
+**Output Data**
+
+The result of the camera returns the list of `TruvideoSdkCameraMedia` which contains the details about the video or photo capture which have these variables
+- `createdAt` (Long): Unix timestamp (in milliseconds) indicating the exact time the media was captured.
+- `filePath` (String): Full path to the captured media file (image or video) on the device's storage.
+- `type` (TruvideoSdkCameraMediaType): Enumerated value specifying the media type (VIDEO or PICTURE).
+- `cameraLensFacing` (TruvideoSdkCameraLensFacing): An enumerated value indicating the camera lens that - captured the media (FRONT or BACK).
+- `rotation` (TruvideoSdkCameraOrientation): Enumerated value representing the media's orientation (e.g., PORTRAIT, LANDSCAPE).
+- `resolution` (TruvideoSdkCameraResolution): Enumerated value specifying the media's resolution containing the value of height, width, and aspect ratio. 
+- `duration` (Long): Applicable only for video media; represents the video's duration in milliseconds.
+```kotlin
+data class TruvideoSdkCameraMedia(
+   val createdAt: Long,
+   val filePath: String,
+   val type: TruvideoSdkCameraMediaType,
+   val cameraLensFacing: TruvideoSdkCameraLensFacing,
+   val rotation: TruvideoSdkCameraOrientation,
+   val resolution: TruvideoSdkCameraResolution,
+   val duration: Long,
+)
+
+enum class TruvideoSdkCameraMediaType {
+   VIDEO,
+   PICTURE;
+}
+```
+

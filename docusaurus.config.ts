@@ -1,6 +1,7 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+// import DropdownNavbarItem from './src/components/DropdownNavbarItem';
 
 const config: Config = {
   title: 'My Site',
@@ -40,6 +41,7 @@ const config: Config = {
           editUrl:
             'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
+        
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
@@ -53,30 +55,87 @@ const config: Config = {
       } satisfies Preset.Options,
     ],
   ],
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'kotlin',
+        path: 'kotlin',
+        routeBasePath: 'kotlin',
+        sidebarPath: require.resolve('./sidebars.js'),
+      }, 
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'swift',
+        path: 'swift',
+        routeBasePath: 'swift',
+        sidebarPath: require.resolve('./sidebars.js'),
+      }, 
+    ],
+  ],
 
   themeConfig: {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: '',
       logo: {
         alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        src: 'img/appstore.png',
       },
       items: [
+        // {
+        //   type: 'docSidebar',
+        //   sidebarId: 'tutorialSidebar',
+        //   position: 'left',
+        //   label: 'Java',
+        // },
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Tutorial',
-        },
-        {to: '/blog', label: 'Blog', position: 'left'},
-        {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          label: 'Technology',
           position: 'right',
+          items: [
+            {
+              type: 'docSidebar',
+              sidebarId: 'tutorialSidebar',
+              label: 'Java',
+            },
+            {
+              to: '/kotlin/Intro',    // ./kotlin/Intro.md
+              label: 'Kotlin',
+              activeBaseRegex: `/kotlin/`,
+            },
+            {
+              to: '/swift/overview',    // ./swift/Intro.md
+              label: 'Swift',
+              activeBaseRegex: `/swift/`,
+            },
+          ],
         },
+        
+        // {to: '/blog', label: 'Java', position: 'left'
+        // , 
+        //   items: [
+        //       {
+        //         href: 'https://github.com/facebook/docusaurus',
+        //         label: 'GitHub',
+        //         position: 'right',
+        //       },
+        //       {
+        //         href: 'https://github.com/facebook/docusaurus',
+        //         label: 'GitHub',
+        //         position: 'right',
+        //       },
+        //   ]
+        // },
+        // {
+        //   href: 'https://github.com/facebook/docusaurus',
+        //   label: 'GitHub',
+        //   position: 'right',
+        // },
       ],
+  
     },
     footer: {
       style: 'dark',
@@ -86,7 +145,11 @@ const config: Config = {
           items: [
             {
               label: 'Tutorial',
-              to: '/docs/intro',
+              to: '/docs/overview',
+            },
+            {
+              label: 'Version History',
+              to: '/docs/overview',
             },
           ],
         },
@@ -94,34 +157,34 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
+              label: 'Support',
               href: 'https://stackoverflow.com/questions/tagged/docusaurus',
             },
             {
-              label: 'Discord',
+              label: 'Slack',
               href: 'https://discordapp.com/invite/docusaurus',
             },
             {
-              label: 'Twitter',
+              label: 'Github',
               href: 'https://twitter.com/docusaurus',
             },
           ],
         },
         {
-          title: 'More',
+          title: 'Legal',
           items: [
             {
-              label: 'Blog',
+              label: 'SDK data privacy',
               to: '/blog',
             },
             {
-              label: 'GitHub',
+              label: 'SDK License',
               href: 'https://github.com/facebook/docusaurus',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Truvideo`,
     },
     prism: {
       theme: prismThemes.github,
